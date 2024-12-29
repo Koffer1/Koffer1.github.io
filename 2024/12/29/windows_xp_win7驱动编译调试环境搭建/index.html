@@ -1,0 +1,1230 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="koffer">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Windows_xp_win7-驱动编译与双虚拟机调试环境搭建一.简述 因最近需要编写一些xp与win7上的驱动程序，但是网上搜索环境配置要不就很老旧，要不很繁琐，最好还是能双虚拟机调试，在网上没有找到能完全满足需求的，就整合网上的一些资源编写此文档。 主要内容为使用vmware 双win7虚拟机调试、win7安装vs2015、使用驱动模板编译win7与xp驱动  二.环境介绍   应用名称 版本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="windows_xp_win7驱动编译调试环境搭建">
+<meta property="og:url" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="koffer&#39;s blog">
+<meta property="og:description" content="Windows_xp_win7-驱动编译与双虚拟机调试环境搭建一.简述 因最近需要编写一些xp与win7上的驱动程序，但是网上搜索环境配置要不就很老旧，要不很繁琐，最好还是能双虚拟机调试，在网上没有找到能完全满足需求的，就整合网上的一些资源编写此文档。 主要内容为使用vmware 双win7虚拟机调试、win7安装vs2015、使用驱动模板编译win7与xp驱动  二.环境介绍   应用名称 版本">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225215103102.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225215131580.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225215218962.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225215604598.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225220248934.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225220640605.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225220717940.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221105405.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221449033.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221533209.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221603524.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221656680.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221749610.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221802026.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221823143.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221857378.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225222132047.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225222324785.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225223552141.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225224355149.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225224604565.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225230137520.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225230849872.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225230904010.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225230924485.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226012901806.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226013221782.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226013706476.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226013858698.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226014549378.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226014635805.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015050873.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015146035.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015445158.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015510577.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015805570.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015838787.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226185952446.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226190145008.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226190155635.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226190259580.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226185716228.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226185803686.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226185917154.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226192152329.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226200005753.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226201250995.png">
+<meta property="og:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226202412267.png">
+<meta property="article:published_time" content="2024-12-29T05:00:08.000Z">
+<meta property="article:modified_time" content="2024-12-29T05:06:29.707Z">
+<meta property="article:author" content="koffer">
+<meta property="article:tag" content="windows_drivers">
+<meta property="article:tag" content="windbg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225215103102.png">
+  
+  
+  
+  <title>windows_xp_win7驱动编译调试环境搭建 - koffer&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"KcBDxBVjuAIRBOMxATX1NGgM-gzGzoHsz","app_key":"wPPBYEGRlaJCidLjpd0ax34K","server_url":"https://kcbdxbvj.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>koffer</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="windows_xp_win7驱动编译调试环境搭建"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-12-29 13:00" pubdate>
+          2024年12月29日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">windows_xp_win7驱动编译调试环境搭建</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Windows-xp-win7-驱动编译与双虚拟机调试环境搭建"><a href="#Windows-xp-win7-驱动编译与双虚拟机调试环境搭建" class="headerlink" title="Windows_xp_win7-驱动编译与双虚拟机调试环境搭建"></a>Windows_xp_win7-驱动编译与双虚拟机调试环境搭建</h1><h2 id="一-简述"><a href="#一-简述" class="headerlink" title="一.简述"></a>一.简述</h2><ul>
+<li>因最近需要编写一些xp与win7上的驱动程序，但是网上搜索环境配置要不就很老旧，要不很繁琐，最好还是能双虚拟机调试，在网上没有找到能完全满足需求的，就整合网上的一些资源编写此文档。</li>
+<li>主要内容为使用vmware 双win7虚拟机调试、win7安装vs2015、使用驱动模板编译win7与xp驱动</li>
+</ul>
+<h2 id="二-环境介绍"><a href="#二-环境介绍" class="headerlink" title="二.环境介绍"></a>二.环境介绍</h2><table>
+<thead>
+<tr>
+<th>应用名称</th>
+<th>版本</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>windows7 x64 调试机</td>
+<td>windows7 x64 sp1</td>
+<td>cn_windows_7_professional_with_sp1_x64_dvd_u_677031.iso</td>
+</tr>
+<tr>
+<td>windows7 x64 被调试机</td>
+<td>windows7 x64 sp1</td>
+<td>cn_windows_7_professional_with_sp1_x64_dvd_u_677031.iso</td>
+</tr>
+<tr>
+<td>WDK 7600</td>
+<td>7600.16385.1</td>
+<td><a target="_blank" rel="noopener" href="https://www.microsoft.com/en-us/download/details.aspx?id=11800">https://www.microsoft.com/en-us/download/details.aspx?id=11800</a></td>
+</tr>
+<tr>
+<td>VS 2015</td>
+<td>Visual Studio <em>2015</em> Community</td>
+<td></td>
+</tr>
+<tr>
+<td>ie 11</td>
+<td>ie 11</td>
+<td><a target="_blank" rel="noopener" href="https://support.microsoft.com/zh-cn/windows/%E4%B8%8B%E8%BD%BD-internet-explorer-11-%E8%84%B1%E6%9C%BA%E5%AE%89%E8%A3%85%E7%A8%8B%E5%BA%8F-99d492a1-3a62-077b-c476-cf028aff9a7f"><strong>https://support.microsoft.com/zh-cn/windows/%E4%B8%8B%E8%BD%BD-internet-explorer-11-%E8%84%B1%E6%9C%BA%E5%AE%89%E8%A3%85%E7%A8%8B%E5%BA%8F-99d492a1-3a62-077b-c476-cf028aff9a7f</strong></a></td>
+</tr>
+<tr>
+<td>wingdb</td>
+<td>6.12</td>
+<td>调试工具</td>
+</tr>
+<tr>
+<td>vmware workstation</td>
+<td>vmware workstation 17 pro</td>
+<td></td>
+</tr>
+<tr>
+<td>SRVINSTW.EXE</td>
+<td>SRVINSTW.EXE</td>
+<td>安装驱动程序</td>
+</tr>
+<tr>
+<td>dbgview64.exe</td>
+<td>dbgview64.exe</td>
+<td>查看驱动打印</td>
+</tr>
+<tr>
+<td>vs2013驱动开发模板</td>
+<td>驱动配置模板</td>
+<td><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-188471.htm">https://bbs.kanxue.com/thread-188471.htm</a></td>
+</tr>
+<tr>
+<td>Everything</td>
+<td>Everything-1.4.1.935.x86-Setup</td>
+<td></td>
+</tr>
+<tr>
+<td>64Signer</td>
+<td>64Signer</td>
+<td>签名工具</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>win7 虚拟机不能安装vm tools</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://catalog.update.microsoft.com/Search.aspx?q=kb4474419">https://catalog.update.microsoft.com/Search.aspx?q=kb4474419</a></li>
+</ul>
+</li>
+<li><p>vs2015支持模板导出，也可以选择制作自己的模板</p>
+</li>
+</ul>
+<h2 id="三-安装测试wdk7600"><a href="#三-安装测试wdk7600" class="headerlink" title="三.安装测试wdk7600"></a>三.安装测试wdk7600</h2><h3 id="3-1-安装wdk7600"><a href="#3-1-安装wdk7600" class="headerlink" title="3.1.安装wdk7600"></a>3.1.安装wdk7600</h3><ul>
+<li>下载<code>WDK 7600</code>并解压执行</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225215103102.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>勾选全部选项并点击ok</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225215131580.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>选择路径，我这直接点击ok</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225215218962.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>点击<code>Finish</code>完成安装</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225215604598.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h3 id="3-2-使用wdk7600编译驱动程序"><a href="#3-2-使用wdk7600编译驱动程序" class="headerlink" title="3.2.使用wdk7600编译驱动程序"></a>3.2.使用wdk7600编译驱动程序</h3><h4 id="3-2-1-驱动代码"><a href="#3-2-1-驱动代码" class="headerlink" title="3.2.1.驱动代码"></a>3.2.1.驱动代码</h4><ul>
+<li><p>创建<code>first</code>目录，在此目录中创建三个文件</p>
+</li>
+<li><p>first.c</p>
+</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp">		 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;ntddk.h&gt;</span></span><br><br><span class="hljs-function">VOID <span class="hljs-title">DriverUnload</span><span class="hljs-params">(PDRIVER_OBJECT driver)</span></span>&#123;<br>		     <span class="hljs-built_in">DbgPrint</span>(<span class="hljs-string">&quot;first:Our driver is unloading\r\n&quot;</span>);<br>		 &#125;<br>		 <span class="hljs-function">NTSTATUS <span class="hljs-title">DriverEntry</span><span class="hljs-params">(PDRIVER_OBJECT driver,PUNICODE_STRING reg_path)</span></span>&#123;<br>		     <br>		     <span class="hljs-built_in">DbgPrint</span>(<span class="hljs-string">&quot;first:Our hello my salary\r\n&quot;</span>);<br>		     <br>		     driver-&gt;DriverUnload=DriverUnload;<br>		     <span class="hljs-keyword">return</span> STATUS_SUCCESS;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>makefile</li>
+</ul>
+<figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs erlang-repl">!IF <span class="hljs-number">0</span><br>Module Name:<br>makefile .<br>Notes:<br>DO NOT EDIT THIS FILE!!!<br>!ENDIF<br>!INCLUDE $(NTMAKEENV)\makefile.def<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>SOURCES</li>
+</ul>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">TARGETNAME</span><span class="hljs-operator">=</span>first<br><span class="hljs-attribute">TARGETTYPE</span><span class="hljs-operator">=</span>DRIVER<br><span class="hljs-attribute">SOURCES</span><span class="hljs-operator">=</span>first.c<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p>TARGETNAME表示名字，编译出来之后模块的名字first.sys</p>
+</li>
+<li><p>SOURCES表示要编译的.c文件</p>
+</li>
+<li><ul>
+<li>不要加入.h文件，.h是被包含在.c文件中编译的</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-2-2-编译"><a href="#3-2-2-编译" class="headerlink" title="3.2.2.编译"></a>3.2.2.编译</h4><ul>
+<li>开始菜单中，选择 所有程序 ,然后选择 <code>Windows Driver Kits</code>  -&gt; <code>WDK版本</code> -&gt;   <code>Build Environments</code>  -&gt;  <code>Windows 7</code>  -&gt;   <code>x64 Checked Build Environment</code></li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225220248934.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>进入 first 目录执行 build 命令</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225220640605.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>编译结束， first.sys 出现在 <code>C:\Users\test\Desktop\first\objchk_win7_amd64\amd64</code> 目录下</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225220717940.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h3 id="3-3-测试驱动程序"><a href="#3-3-测试驱动程序" class="headerlink" title="3.3.测试驱动程序"></a>3.3.测试驱动程序</h3><h4 id="3-3-1-安装驱动程序"><a href="#3-3-1-安装驱动程序" class="headerlink" title="3.3.1.安装驱动程序"></a>3.3.1.安装驱动程序</h4><ul>
+<li>在一台新安装的<code>win7 x64 sp1</code>虚拟机上执行，在开机时按下<code>f8</code>，禁用驱动签名，将生成的<code>first.sys</code>拷贝到此虚拟机</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221105405.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+
+
+<ul>
+<li>使用管理员权限打开<code>SRVINSTW.EXE</code>，<code>安装服务</code>点击下一步</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221449033.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li><code>本地机器</code>点击下一步</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221533209.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>服务名称填写<code>first</code>然后点击下一步</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221603524.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>根据<code>first.sys</code>所在路径填写，文件位置</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221656680.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>选择<code>设备驱动</code>，点击下一步</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221749610.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>默认点击下一步</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221802026.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>选择<code>手动</code>，点击下一步</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221823143.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>点击<code>完成</code>，弹出服务成功安装</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225221857378.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<h4 id="3-3-2-执行驱动程序"><a href="#3-3-2-执行驱动程序" class="headerlink" title="3.3.2.执行驱动程序"></a>3.3.2.执行驱动程序</h4><ul>
+<li>管理器权限执行<code>dbgview64.exe</code>，在菜单栏点击<code>capture</code>，然后全部勾选</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225222132047.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>管理员启动<code>cmd</code>，执行<code>net start first</code>,可以看到<code>dbgview64.exe</code>,有打印输出与，上述驱动代码相同</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225222324785.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">net <span class="hljs-built_in">start</span> <span class="hljs-keyword">first</span> \\启动驱动<br>net <span class="hljs-built_in">stop</span> <span class="hljs-keyword">first</span>	\\停止驱动<br>sc <span class="hljs-built_in">delete</span> <span class="hljs-keyword">first</span> \\卸载驱动<br></code></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>如上面所示<code>wdk7600</code>安装成功</li>
+</ul>
+<h2 id="四-安装vs2015"><a href="#四-安装vs2015" class="headerlink" title="四.安装vs2015"></a>四.安装vs2015</h2><h3 id="4-1-安装IE11"><a href="#4-1-安装IE11" class="headerlink" title="4.1.安装IE11"></a>4.1.安装IE11</h3><ul>
+<li>因为vs2015要求安装<code>ie 10</code>以上版本，这里安装<code>ie11</code></li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225223552141.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li><p>可能有下列情况，先尝试直接安装，直接安装不成功或者看报错信息在选择执行情况1或情况2</p>
+</li>
+<li><p>情况1：有可能安装<code>IE11</code>需要补丁，补丁链接如下</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs avrasm"><span class="hljs-number">32</span>位<br><br><span class="hljs-symbol">http:</span>//www.microsoft.com/<span class="hljs-built_in">zh</span>-cn/download/internet-explorer.aspx<br><br><span class="hljs-number">64</span>位<br><br><span class="hljs-symbol">http:</span>//www.microsoft.com/<span class="hljs-built_in">zh</span>-cn/download/details.aspx?id=<span class="hljs-number">45154</span><br></code></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>情况2安装证书：</p>
+</li>
+<li><p>在win10系统上Windows键+R 弹出<code>运行</code>对话框，输入<code>certmgr.msc</code>，打开Windows的证书管理器</p>
+</li>
+<li><p>导出如下证书安装在win7系统上</p>
+</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-number">1</span><span class="hljs-selector-class">.Microsoft</span> Root Certificate Authority <span class="hljs-number">2010</span>；<br><br><span class="hljs-number">2</span><span class="hljs-selector-class">.Microsoft</span> Root Certificate Authority <span class="hljs-number">2011</span>；<br><br><span class="hljs-number">3</span><span class="hljs-selector-class">.COMODO</span> RSA Certification Authority；<br><br></code></pre></td></tr></table></figure>
+
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225224355149.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>将上面三个证书拷贝到<code>win7</code>系统然后安装上去</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225224604565.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<h3 id="4-2-安装vs2015"><a href="#4-2-安装vs2015" class="headerlink" title="4.2.安装vs2015"></a>4.2.安装vs2015</h3><ul>
+<li>运行<code>vs2015</code>安装程序，这里我选择自定义</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225230137520.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>只选择<code>c++</code>然后点击下一步</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225230849872.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>点击安装</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225230904010.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>等待安装成功即可</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241225230924485.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226012901806.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+
+
+
+
+<h2 id="五-配置vs2015编译驱动"><a href="#五-配置vs2015编译驱动" class="headerlink" title="五.配置vs2015编译驱动"></a>五.配置vs2015编译驱动</h2><ul>
+<li>这里是使用模板的方式进行的配置编译驱动，这里直接使用网上大佬放出来的模板，也可以自己进行配置然后导出是一样的，但是会很耗费时间与精力</li>
+</ul>
+<h3 id="5-1-配置环境变量"><a href="#5-1-配置环境变量" class="headerlink" title="5.1.配置环境变量"></a>5.1.配置环境变量</h3><ul>
+<li>新建<code>WDKPATH</code>,并添加wdk路径</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226013221782.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h3 id="5-2-设置模板"><a href="#5-2-设置模板" class="headerlink" title="5.2.设置模板"></a>5.2.设置模板</h3><ul>
+<li>安装<code>Everything</code>,搜索<code>ProjectTemplates</code>目录</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226013706476.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>进入<code>ProjectTemplates</code>,将下载好的模板拷贝过去，然后重启系统</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226013858698.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h3 id="5-3-编译驱动程序"><a href="#5-3-编译驱动程序" class="headerlink" title="5.3.编译驱动程序"></a>5.3.编译驱动程序</h3><ul>
+<li>打开<code>vs2015</code>创建新项目，点击<code>c++</code>，可以发现出现了<code>Windows Driver1</code></li>
+<li>创建<code>Windows Driver1</code>项目，名称填写<code>first2</code>,将一开始编写的驱动代码拷贝过去</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226014549378.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>如下图所示使用此项目可以编译多种系统的驱动,<code>Checked</code>为调试，<code>free</code>为re版</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226014635805.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>并且可以选择<code>x64</code>和<code>x86</code>，需要注意无法编译<code>xp</code>下的<code>x64</code>的驱动程序</li>
+<li>需要注意这是使用<code>vs2013</code>的模板，需要将项目属性改为<code>v140</code></li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015050873.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li><code>生成</code>-&gt;<code>重新生成解决方案</code></li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015146035.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h3 id="5-4-更改模板"><a href="#5-4-更改模板" class="headerlink" title="5.4.更改模板"></a>5.4.更改模板</h3><ul>
+<li>1.更改上面的<code>平台工具集</code></li>
+<li>2.在属性面板，可以看到<code>全程序优化</code>（无全程序优化）</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015445158.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>3.更改到<code>re</code>版，可以看到<code>使用链接时间代码生成</code></li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015510577.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>在属性页，点击<code>链接器</code>-&gt;<code>优化</code>-&gt;<code>使用快速链接时间代码生成 (/LTCG:incremental)</code>,这样编译会报错</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015805570.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>需要改成<code>使用链接时间代码生成 (/LTCG)</code>,即可完成编译</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226015838787.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>自己也可以制作成模板，就不需要每次编写驱动，进行配置vs</li>
+</ul>
+<h2 id="六-双虚拟机调试驱动"><a href="#六-双虚拟机调试驱动" class="headerlink" title="六.双虚拟机调试驱动"></a>六.双虚拟机调试驱动</h2><ul>
+<li>本文中的调试机与被调试机都为<code>win7 x64 sp1</code></li>
+</ul>
+<h3 id="6-1-配置调试机"><a href="#6-1-配置调试机" class="headerlink" title="6.1.配置调试机"></a>6.1.配置调试机</h3><ul>
+<li>该端是<a target="_blank" rel="noopener" href="https://cloud.tencent.com/product/cvm/?from_column=20065&from=20065">服务器</a> ，另一端是虚拟机</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226185952446.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>打开windbg左上角的 File然后点击Kernel Debug 然后再点击 COM ，设置如下图所示 ，然后点击确定</li>
+<li>安装的wdk7600中就带有<code>windbg</code></li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226190145008.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>选择com，然后点击确认，设置如下图所示</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226190155635.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>点击确定后的画面如下图所示，然后重启Win 7 在 Win 7 虚拟机那边选择启用调试程序</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226190259580.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+
+
+
+
+<h3 id="6-2-配置被调试机"><a href="#6-2-配置被调试机" class="headerlink" title="6.2.配置被调试机"></a>6.2.配置被调试机</h3><ul>
+<li>虚拟机的串行端口设置如下（该端是客户端 ，另一端是虚拟机 ），命名管道设置为 <a href="file://./pipe/com_1">\.\pipe\com_1</a></li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226185716228.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>以管理员身份运行cmd执行<code>bcdedit</code> ,一般只有一个标识为{current}的启动加载器是当前的启动配置</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226185803686.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>使用如下命令建立一个新的启动项，并且使用bcdedit检查是否copy成功</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">bcdedit /copy &#123;current&#125; /d <span class="hljs-string">&quot;Windwos7&quot;</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>设置新的启动项</li>
+</ul>
+ <figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">bcdedit /<span class="hljs-keyword">debug</span> <span class="hljs-keyword">ON</span><br>bcdedit /bootdebug <span class="hljs-keyword">ON</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>查看当前的调试配置<code>bcdedit /dbgsettings</code>,一般会显示出使用的第一个串口波特率为115200bps</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226185917154.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>选择菜单的超时，我设置为15秒：  bcdedit &#x2F;timeout 15 </li>
+<li>重新启动，当需要调试时就用调试模式进入</li>
+</ul>
+<h3 id="6-3-驱动调试准备"><a href="#6-3-驱动调试准备" class="headerlink" title="6.3.驱动调试准备"></a>6.3.驱动调试准备</h3><h4 id="6-3-1-断点"><a href="#6-3-1-断点" class="headerlink" title="6.3.1.断点"></a>6.3.1.断点</h4><ul>
+<li><p>32位支持内联asm汇编</p>
+</li>
+<li><p>64位利用在Source文件中直接添加asm文件，直接在asm文件中写汇编代码，然后将asm文件编译为OBJ文件。然后就可以在c++文件中声明asm文件中的函数后直接使用asm文件中用汇编写的函数</p>
+</li>
+<li><p>64位也可使用 DbgBreakPoint(); </p>
+<ul>
+<li>本文使用此方法</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;ntddk.h&gt;</span></span><br><span class="hljs-function">VOID <span class="hljs-title">DriverUnload</span><span class="hljs-params">(PDRIVER_OBJECT driver)</span> </span>&#123;<br>	<span class="hljs-built_in">DbgPrint</span>(<span class="hljs-string">&quot;first:Our driver is unloading\r\n&quot;</span>);<br>&#125;<br><span class="hljs-function">NTSTATUS <span class="hljs-title">DriverEntry</span><span class="hljs-params">(PDRIVER_OBJECT driver, PUNICODE_STRING reg_path)</span> </span>&#123;<br>	<span class="hljs-built_in">DbgBreakPoint</span>();<br>	<span class="hljs-built_in">DbgPrint</span>(<span class="hljs-string">&quot;first:Our hello my salary\r\n&quot;</span>);<br><br>	driver-&gt;DriverUnload = DriverUnload;<br>	<span class="hljs-keyword">return</span> STATUS_SUCCESS;<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="6-3-2-签名"><a href="#6-3-2-签名" class="headerlink" title="6.3.2.签名"></a>6.3.2.签名</h4><ul>
+<li>win7 x64安装驱动需要签名，这里使用<code>64Signer</code></li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226192152329.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+
+
+<h4 id="6-3-3-调试符号下载与配置"><a href="#6-3-3-调试符号下载与配置" class="headerlink" title="6.3.3.调试符号下载与配置"></a>6.3.3.调试符号下载与配置</h4><ul>
+<li>使用windbg自动下载符号很慢，所以使用windbg目录中存在 symchk.exe 程序，使用如下命令可进行下载</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"> symchk.exe /r c:\windows\system32\ /s SRV*C:\Users\<span class="hljs-built_in">test</span>\Desktop\symblos\*http://msdl.microsoft.com/download/symbols <br><br>- /r c:\windows\system32\ 下载system32下的符号<br>- SRV*C:\Users\<span class="hljs-built_in">test</span>\Desktop\symblos\ 下载符号的保存路径<br>- http://msdl.microsoft.com/download/symbols 微软的符号服务器<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>加载被调试驱动的符号</li>
+<li>Windbg-&gt;file-&gt;symbol file path,根据自己的路径填写，本文填写示例如下：</li>
+</ul>
+<figure class="highlight moonscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs moonscript"><span class="hljs-name">C</span>:\Users\test\Desktop\code\test\first6\x64\Checked_win7;srv*<span class="hljs-name">C</span>:\Users\test\Desktop\symblos*<span class="hljs-name">http</span>://msdl.microsoft.com/download/symbols<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>第一个路径为编译驱动的驱动的符号路径，使用<code>；</code>分割</li>
+</ul>
+<h3 id="6-4-驱动调试"><a href="#6-4-驱动调试" class="headerlink" title="6.4.驱动调试"></a>6.4.驱动调试</h3><ul>
+<li>调试机-打开windbg左上角的 File然后点击Kernel Debug 然后再点击 COM ，设置如下图所示 ，然后点击确定</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226200005753.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>被调试机启动选择<code>启用调试程序 </code></li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226201250995.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>被调试机启动驱动</li>
+</ul>
+<img src="/2024/12/29/windows_xp_win7%E9%A9%B1%E5%8A%A8%E7%BC%96%E8%AF%91%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/20241226202412267.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h2 id="七-参考链接"><a href="#七-参考链接" class="headerlink" title="七.参考链接"></a>七.参考链接</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/revercc/p/14609685.html">https://www.cnblogs.com/revercc/p/14609685.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-188471.htm">https://bbs.kanxue.com/thread-188471.htm</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/fonx/article/details/79720490?spm=1001.2101.3001.6650.13&utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-13-79720490-blog-104530361.235%5Ev43%5Epc_blog_bottom_relevance_base8&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-13-79720490-blog-104530361.235%5Ev43%5Epc_blog_bottom_relevance_base8&utm_relevant_index=20">https://blog.csdn.net/fonx/article/details/79720490?spm=1001.2101.3001.6650.13&amp;utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-13-79720490-blog-104530361.235%5Ev43%5Epc_blog_bottom_relevance_base8&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-13-79720490-blog-104530361.235%5Ev43%5Epc_blog_bottom_relevance_base8&amp;utm_relevant_index=20</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/jmh1996/article/details/88382133">https://blog.csdn.net/jmh1996/article/details/88382133</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1621329?sid_for_share=99125_3">https://cloud.tencent.com/developer/article/1621329?sid_for_share=99125_3</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-261326.htm">https://bbs.kanxue.com/thread-261326.htm</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-251052.htm">https://bbs.kanxue.com/thread-251052.htm</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42931917/article/details/108265848">https://blog.csdn.net/qq_42931917/article/details/108265848</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/window-security/" class="category-chain-item">window_security</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/windows-drivers/" class="print-no-link">#windows_drivers</a>
+      
+        <a href="/tags/windbg/" class="print-no-link">#windbg</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>windows_xp_win7驱动编译调试环境搭建</div>
+      <div>http://example.com/2024/12/29/windows_xp_win7驱动编译调试环境搭建/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>koffer</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年12月29日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/01/25/CVE-2022-40684/" title="CVE-2022-40684">
+                        <span class="hidden-mobile">CVE-2022-40684</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"KcBDxBVjuAIRBOMxATX1NGgM-gzGzoHsz","appKey":"wPPBYEGRlaJCidLjpd0ax34K","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"https://kcbdxbvj.lc-cn-n1-shared.com","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
