@@ -19,16 +19,27 @@
     <meta name="description" content="CVE-2024-26230一.简述 CVE-2024-26230 是在 Windows 电话服务 (TapiSrv) 中发现的一个权限提升漏洞。该漏洞是因为在FreeDialogInstance函数中释放不当导致的UAF，通过伪造对象在TUISPIDLLCallback函数中获得代码执行权限。在上面的基础上，结合其他技术来绕过控制流保护（CFG）等缓解措施，进行加载dll最终通过PrintSpo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CVE-2024-26230">
-<meta property="og:url" content="http://example.com/2025/08/17/CVE-2024-26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/index.html">
+<meta property="og:url" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="koffer&#39;s blog">
 <meta property="og:description" content="CVE-2024-26230一.简述 CVE-2024-26230 是在 Windows 电话服务 (TapiSrv) 中发现的一个权限提升漏洞。该漏洞是因为在FreeDialogInstance函数中释放不当导致的UAF，通过伪造对象在TUISPIDLLCallback函数中获得代码执行权限。在上面的基础上，结合其他技术来绕过控制流保护（CFG）等缓解措施，进行加载dll最终通过PrintSpo">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250814001348707.png">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817170103687.png">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817171001088.png">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817181258744.png">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817182022044.png">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817182241499.png">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817183623961.png">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817194640976.png">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817191351312.png">
+<meta property="og:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817195044174.png">
 <meta property="article:published_time" content="2025-08-17T12:40:08.000Z">
 <meta property="article:modified_time" content="2025-08-17T12:39:55.740Z">
 <meta property="article:author" content="koffer">
 <meta property="article:tag" content="vulnerability_analysis">
 <meta property="article:tag" content="Windows_cve">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250814001348707.png">
   
   
   
@@ -314,7 +325,7 @@
                 <h1 id="CVE-2024-26230"><a href="#CVE-2024-26230" class="headerlink" title="CVE-2024-26230"></a>CVE-2024-26230</h1><h2 id="一-简述"><a href="#一-简述" class="headerlink" title="一.简述"></a>一.简述</h2><ul>
 <li>CVE-2024-26230 是在 Windows 电话服务 (TapiSrv) 中发现的一个权限提升漏洞。该漏洞是因为在<code>FreeDialogInstance</code>函数中释放不当导致的UAF，通过伪造对象在<code>TUISPIDLLCallback</code>函数中获得代码执行权限。在上面的基础上，结合其他技术来绕过控制流保护（CFG）等缓解措施，进行加载dll最终通过PrintSpoofer 获取系统权限。</li>
 </ul>
-<h2 id="二-影响版本"><a href="#二-影响版本" class="headerlink" title="二.影响版本"></a>二.影响版本</h2>
+<h2 id="二-影响版本"><a href="#二-影响版本" class="headerlink" title="二.影响版本"></a>二.影响版本</h2><img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250814001348707.png" srcset="/img/loading.gif" lazyload class="" title="png">
 <h2 id="三-分析环境"><a href="#三-分析环境" class="headerlink" title="三.分析环境"></a>三.分析环境</h2><ul>
 <li>Microsoft Windows 10 Version 22H2 Build 19045.3803 AMD64</li>
 <li>C:\Windows\System32\tapisrv.dll</li>
@@ -338,8 +349,8 @@
 <h3 id="4-2-客户端请求"><a href="#4-2-客户端请求" class="headerlink" title="4.2.客户端请求"></a>4.2.客户端请求</h3><ul>
 <li>这里最重要的接口是<code>ClientRequest</code>，它允许与电话服务进行通信，使用服务中提供的各种功能。</li>
 </ul>
-
-
+<img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817170103687.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817171001088.png" srcset="/img/loading.gif" lazyload class="" title="png">
 <ul>
 <li>如上图所示，存在一个名为 gaFuncs 的全局变量，它在 ClientRequest 方法中充当着一个路由变量的角色，用于将请求分发至特定的分发函数。而它具体路由到哪个分发函数，则取决于一个可被设置的值。</li>
 <li><code>ClientRequest</code>函数接受一个缓冲区<code>pBuffer</code>，其作为第二个参数，该<code>pBuffer</code>结构定义如下：<ul>
@@ -369,7 +380,7 @@
 <ul>
 <li>该 object 在 ClientAttach 函数中初始化，当服务引用某个对象时，它会检查该对象是否由指定的 context handle object 拥有，如下代码所示：</li>
 </ul>
-
+<img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817181258744.png" srcset="/img/loading.gif" lazyload class="" title="png">
 
 
 <ul>
@@ -379,20 +390,20 @@
 </ul>
 </li>
 </ul>
-
+<img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817182022044.png" srcset="/img/loading.gif" lazyload class="" title="png">
 
 
 <ul>
 <li>在<code>TUISPIDLLCallBack</code>函数中尝试使用已释放的<code>GOLD</code>对象（该对象现在是一个悬垂指针）。它访问<code>v12 + 0x20</code>并随后调用一个虚函数，从而触发UAF漏洞。</li>
 </ul>
-
+<img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817182241499.png" srcset="/img/loading.gif" lazyload class="" title="png">
 
 
 
 
 <h2 id="六-漏洞利用"><a href="#六-漏洞利用" class="headerlink" title="六.漏洞利用"></a>六.漏洞利用</h2><h3 id="6-1-对象伪造"><a href="#6-1-对象伪造" class="headerlink" title="6.1.对象伪造"></a>6.1.对象伪造</h3><p>在典型的 UAF 漏洞利用场景中，首先需要找到一个合适的对象，作为漏洞利用原语。在内核模式下，可以利用各种对象来实现此目的。然而，在用户模式下（<code>TAPISrv</code>以 RPC 服务的形式运行），该漏洞只能利用同一进程内的对象来利用。因此，如果目标进程中没有合适的对象，则无法直接利用该漏洞。</p>
 <p>不在局限于寻找合适的对象作为漏洞利用原语，而是找到一个允许我们创建内存分配的原语，使其大小和内容都完全可控。通过这种方法，我们可以构造一个可以用来利用漏洞的伪造对象。其中一个原语是名为的调度函数<code>TRequestMakeCall</code>，它打开注册表项<code>Software\\Microsoft\\Windows\\CurrentVersion\\Telephony\\HandoffPriorities</code>并分配内存来存储键值。</p>
-
+<img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817183623961.png" srcset="/img/loading.gif" lazyload class="" title="png">
 
 
 <p>通过检查注册表权限，确定该键可由当前用户完全控制，在函数”GetPriorityList”中，它首先检索键的类型和大小，然后分配一个堆来存储键值。这意味着，如果我能控制键值，我就能控制堆的大小和内容。”RequestMakeCall” 的默认类型是 REG_SZ，但由于当前用户对其拥有完全控制权限，可以删除默认值并创建一个 REG_BINARY 类型的键值。如上就可以将键值的大小和内容设置为任意值，使其成为一个实用的原语。</p>
@@ -406,13 +417,13 @@
 </ul>
 </li>
 </ul>
-
+<img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817194640976.png" srcset="/img/loading.gif" lazyload class="" title="png">
 
 
 <h3 id="6-3-对抗缓解措施"><a href="#6-3-对抗缓解措施" class="headerlink" title="6.3.对抗缓解措施"></a>6.3.对抗缓解措施</h3><ul>
 <li>经过上面的内存分配，控制键值伪造对象，当调用TUISPIDLLCallback函数触发”代码执行”时，控制缓冲区是RPC接口的输入缓冲区，如果我将其设置为3，它会将一个magic值与worker对象进行比较，然后从worker对象中获取一个虚函数地址，这样我就只需要在注册表键值的内容中设置这两个值即可。</li>
 </ul>
-
+<img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817191351312.png" srcset="/img/loading.gif" lazyload class="" title="png">
 <ul>
 <li>可以控制虚函数的地址，这意味着我可以控制 RIP 寄存器指向任何所需位置。然而，<strong>控制流保护 (CFC)<strong>缓解措施可以阻止在此次利用尝试中创建 ROP（面向返回编程）链。有关</strong>控制流保护</strong>的更多信息，请参阅以下参考资料：<ul>
 <li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/win32/secbp/control-flow-guard">控制流防护缓解</a></li>
@@ -424,7 +435,7 @@
 <ul>
 <li>1.利用上面描述的 UAF 漏洞调用<code>malloc</code>函数，如果<code>malloc</code>成功执行，在<code>TUISPIDLLCallback</code>函数中返回值的低 32 位会被写入 RPC 输入缓冲区并返回给客户端，因此导致信息泄露</li>
 </ul>
-
+<img src="/2025/08/17/CVE_2024_26230%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/20250817195044174.png" srcset="/img/loading.gif" lazyload class="" title="png">
 
 
 <ul>
@@ -499,7 +510,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>CVE-2024-26230</div>
-      <div>http://example.com/2025/08/17/CVE-2024-26230漏洞分析/</div>
+      <div>http://example.com/2025/08/17/CVE_2024_26230漏洞分析/</div>
     </div>
     <div class="license-meta">
       
