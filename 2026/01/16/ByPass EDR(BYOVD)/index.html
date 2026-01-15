@@ -1,0 +1,1233 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="koffer">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="新手向驱动摘链-ByPass EDR一.简述 EDR是当前网络安全攻防领域一个非常前沿且”火热”的方向,EDR (Endpoint Detection and Response) 的核心思想是”持续监控并响应”,它不只看文件是不是”恶意”的，而是监控端点上的一切行为：进程创建、网络连接、文件读写、注册表修改、API调用等。通过分析这些行为的关联性，来发现可疑或恶意的活动。  EDR 规避技术种类繁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ByPassEdr(BYOVD)">
+<meta property="og:url" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/index.html">
+<meta property="og:site_name" content="koffer&#39;s blog">
+<meta property="og:description" content="新手向驱动摘链-ByPass EDR一.简述 EDR是当前网络安全攻防领域一个非常前沿且”火热”的方向,EDR (Endpoint Detection and Response) 的核心思想是”持续监控并响应”,它不只看文件是不是”恶意”的，而是监控端点上的一切行为：进程创建、网络连接、文件读写、注册表修改、API调用等。通过分析这些行为的关联性，来发现可疑或恶意的活动。  EDR 规避技术种类繁">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730093958958.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730094114087.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730111835855.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730114806713.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730114959056.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730114156574.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730111127159.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730141223239.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730142305470.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730151106264.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730144714408.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730151353515.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730153718904.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730153917247.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730154307682.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730154636521.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730160148499.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730160245769.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730160848998.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730161630277.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730163506488.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730163714837.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730164013951.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730164337509.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730165536144.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730165710269.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730170400998.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730191309451.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730191320624.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730182737898.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730180025828.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730180958307.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730181040635.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730182109686.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730171425699.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730172330037.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730172434365.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730172532615.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730173744398.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250731091630219.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730191944090.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730194324974.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250731101730018.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250731101807596.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250731103513163.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801161320700.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801164355271.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801164417820.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801162253175.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801162303495.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801165954369.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801170012283.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801170033069.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801170122278.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801170202632.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801170218050.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801170413877.png">
+<meta property="og:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250801170433615.png">
+<meta property="article:published_time" content="2026-01-15T16:20:08.000Z">
+<meta property="article:modified_time" content="2026-01-15T17:30:30.893Z">
+<meta property="article:author" content="koffer">
+<meta property="article:tag" content="bypassedr">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2026/01/16/ByPass%20EDR(BYOVD)/20250730093958958.png">
+  
+  
+  
+  <title>ByPassEdr(BYOVD) - koffer&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"KcBDxBVjuAIRBOMxATX1NGgM-gzGzoHsz","app_key":"wPPBYEGRlaJCidLjpd0ax34K","server_url":"https://kcbdxbvj.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>koffer</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="ByPassEdr(BYOVD)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-01-16 00:20" pubdate>
+          2026年1月16日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          48 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">ByPassEdr(BYOVD)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="新手向驱动摘链-ByPass-EDR"><a href="#新手向驱动摘链-ByPass-EDR" class="headerlink" title="新手向驱动摘链-ByPass EDR"></a>新手向驱动摘链-ByPass EDR</h1><h2 id="一-简述"><a href="#一-简述" class="headerlink" title="一.简述"></a>一.简述</h2><ul>
+<li><p>EDR是当前网络安全攻防领域一个非常前沿且”火热”的方向,EDR (Endpoint Detection and Response) 的核心思想是”持续监控并响应”,它不只看文件是不是”恶意”的，而是监控端点上的一切行为：进程创建、网络连接、文件读写、注册表修改、API调用等。通过分析这些行为的关联性，来发现可疑或恶意的活动。</p>
+</li>
+<li><p>EDR 规避技术种类繁多，这里是介绍了通过摘掉Windows系统提供的回调函数，使得使用系统回调进行监控的EDR失效或者说致盲。</p>
+</li>
+<li><p>这篇文章写好久了，一直因为各种原因搁置了，有点失眠，就发出吧，现在win11 又加了好多安全机制，虚拟化保护啊啥的目前也只是有个绕过思路，如果以后还是决定做这块，并且做出来了在和大家分享，或者以后出了那种比较好的方案我也会借鉴一下。</p>
+</li>
+</ul>
+<h2 id="二-微软的”拨乱反正”-PatchGuard与驱动签名"><a href="#二-微软的”拨乱反正”-PatchGuard与驱动签名" class="headerlink" title="二.微软的”拨乱反正” - PatchGuard与驱动签名"></a>二.微软的”拨乱反正” - PatchGuard与驱动签名</h2><ul>
+<li>在早期<strong>内核可被任意修改</strong>，任何获得管理员权限的程序，都可以加载一个驱动程序到内核，这个驱动程序可以随意更改系统，后来大量不规范的的驱动、恶意软件随意修改内核，导致冲突和蓝屏死机（BSOD）司空见惯。面对这种混乱，微软推出64位Windows时，推出了PatchGuard 用于保护内核不受更改，所有依赖修改内核关键结构来实现功能的软件<strong>立即触发蓝屏死机（BSOD）</strong>，并且加载驱动需要有效的数字签名。</li>
+<li>微软提供了PsSetCreateProcessNotifyRoutine、文件系统微过滤等合法接口来监控系统，这使得它们的行为更加规范化。</li>
+</ul>
+<h2 id="三-摘链清除EDR的注册回调"><a href="#三-摘链清除EDR的注册回调" class="headerlink" title="三.摘链清除EDR的注册回调"></a>三.摘链清除EDR的注册回调</h2><h3 id="3-1-内核回调"><a href="#3-1-内核回调" class="headerlink" title="3.1.内核回调"></a>3.1.内核回调</h3><ul>
+<li>下面先说明下EDR 通常会用到的回调注册函数以及清除相应的回调会有什么效果。</li>
+</ul>
+<ol>
+<li><code>ObRegisterCallbacks()</code></li>
+</ol>
+<p>​	该函数用于注册句柄操作的回调，是EDR实现关键进程（如自身、lsass.exe等）保护的核心机制。用此函数注册回调后，任何尝试获取或复制受保护进程句柄的操作，都会触发此回调，通过降权等操作保护进程。因此移除该回调可获取重要进程（如EDR）的高权限句柄，进而对受保护进程执行内存转储、调试或终止等操作。</p>
+<p>2.<code>CmRegisterCallback(Ex)</code></p>
+<p>​	该函数用于注册注册表操作的回调，是EDR监控和阻止恶意操作注册表（如自启动、配置篡改）的关键机制。注册此回调后，任何对注册表的访问、创建或修改等行为都会触发回调，从而使EDR能有效阻止恶意软件添加自启动项或篡改服务配置。移除此回调将使EDR的注册表防护失效。需要注意的是，该回调列表受到PatchGuard保护，直接篡改其地址将触发BSOD，其绕过技术将在后文阐述。</p>
+<p>3.<code>PsSetCreateProcessNotifyRoutine(Ex)</code><br>    该函数用于注册一个进程监控回调，它是EDR实现其进程监控功能的核心机制。使用此函数注册回调后，在操作系统中有进程创建或销毁，内核便会调用此回调。因此通过移除该回调，便可有效规避EDR对进程的监控，使其无法捕获进程的创建与销毁事件，也无法追踪恶意软件的进程调用链。</p>
+<p>4.<code>PsSetCreateThreadNotifyRoutine(Ex)</code></p>
+<p>​	该函数用于注册一个线程监控回调，是EDR实现其线程级监控的核心机制。用此函数注册回调后，每当有线程的创建或销毁，内核便会调用此回调。通过移除该回调，便可有效破坏EDR的线程监控能力，使其无法捕获线程的创建与销毁事件，也无法侦测到如远程线程注入等关键的内存攻击行为。</p>
+<p>5.<code>PsSetLoadImageNotifyRoutine(Ex)</code></p>
+<p>​	该函数用于注册Image（EXE、DLL、驱动） 加载回调，一旦注册，每当操作系统将一个映像文件加载到任何进程的虚拟内存空间时，内核都会自动调用这个回调。EDR可以使用此回调检测DLL劫持、 发现恶意驱动加载 (Rootkit)、监控内存中加载的恶意代码模块（如Mimikatz）等。</p>
+<p>6.<code>MiniFilter微过滤器驱动</code></p>
+<p> 该框架用于注册文件系统操作的回调，是EDR实现文件级监控与自我保护的基石。通过此框架注册回调后，任何文件的创建、读写、删除等操作都会受到监控，EDR可以根据其预设策略（检测）选择放行或者阻止等。因此清除掉EDR注册的文件过滤器，不仅能让EDR无法监控新文件的落地，更能直接删除或修改EDR程序本身。同样，文件过滤管理器的关键结构也受PatchGuard保护，直接篡改会导致系统崩溃，其绕过技术将在后文阐述</p>
+<ul>
+<li>当然还有其他回调，这次主要分析以上6个回调注册函数的回调清除，后面会介绍利用wfp框架阻止EDR信息上传的技术。</li>
+</ul>
+<h3 id="3-2-清除句柄回调（ObRegisterCallbacks）"><a href="#3-2-清除句柄回调（ObRegisterCallbacks）" class="headerlink" title="3.2.清除句柄回调（ObRegisterCallbacks）"></a>3.2.清除句柄回调（ObRegisterCallbacks）</h3><h4 id="3-2-1-添加注册回调"><a href="#3-2-1-添加注册回调" class="headerlink" title="3.2.1.添加注册回调"></a>3.2.1.添加注册回调</h4><img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730093958958.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730094114087.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>上面的代码简单的实现了，通过ObRegisterCallbacks()注册回调函数，实现对指定进程句柄进行降权，删除了PROCESS_TERMINATE 权限从而实现对该进程的保护。在注册回调函数时是通过OB_OPERATION_REGISTRATION 结构中指定回调函数地址，以及注册的对象类型（进程、线程）等其他信息，最终传给ObRegisterCallbacks()函数。</li>
+</ul>
+<h4 id="3-2-2-清除句柄回调"><a href="#3-2-2-清除句柄回调" class="headerlink" title="3.2.2.清除句柄回调"></a>3.2.2.清除句柄回调</h4><ul>
+<li>注册的对象类型：<code>PsProcessType</code>、<code>PsThreadType</code> 为全局内核变量，它俩是<code>OBJECT_TYPE</code> 结构，如下：</li>
+</ul>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs elm">typedef struct _OBJECT_TYPE &#123;<br> <span class="hljs-type">LIST_ENTRY</span> <span class="hljs-type">TypeList</span>;<br> <span class="hljs-type">UNICODE_STRING</span> <span class="hljs-type">Name</span>;<br> <span class="hljs-type">VOID</span>* <span class="hljs-type">DefaultObject</span>; <br> <span class="hljs-type">UCHAR</span> <span class="hljs-type">Index</span>;<br> unsigned __int32 <span class="hljs-type">TotalNumberOfObjects</span>;<br> unsigned __int32 <span class="hljs-type">TotalNumberOfHandles</span>;<br> unsigned __int32 <span class="hljs-type">HighWaterNumberOfObjects</span>;<br> unsigned __int32 <span class="hljs-type">HighWaterNumberOfHandles</span>;<br> <span class="hljs-type">OBJECT_TYPE_INITIALIZER</span> <span class="hljs-type">TypeInfo</span>;<br> <span class="hljs-type">EX_PUSH_LOCK</span> <span class="hljs-type">TypeLock</span>;<br> unsigned __int32 <span class="hljs-type">Key</span>;<br> <span class="hljs-type">LIST_ENTRY</span> <span class="hljs-type">CallbackList</span>; <br>&#125;<span class="hljs-type">OBJECT_TYPE</span>, *<span class="hljs-type">POBJECT_TYPE</span>;<br></code></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>OBJECT_TYPE结构的<code>CallbackList</code>是一个由<code>CALLBACK_ENTRY_ITEM</code>结构（未记录）组成的双向链表</li>
+</ul>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs elm">typedef struct _CALLBACK_ENTRY_ITEM &#123;<br><span class="hljs-type">LIST_ENTRY</span> <span class="hljs-type">EntryItemList</span>;<br><span class="hljs-type">OB_OPERATION</span> <span class="hljs-type">Operations</span>;<br><span class="hljs-type">CALLBACK_ENTRY</span>* <span class="hljs-type">CallbackEntry</span>; <br><span class="hljs-type">POBJECT_TYPE</span> <span class="hljs-type">ObjectType</span>;<br><span class="hljs-type">POB_PRE_OPERATION_CALLBACK</span> <span class="hljs-type">PreOperation</span>;<br><span class="hljs-type">POB_POST_OPERATION_CALLBACK</span> <span class="hljs-type">PostOperation</span>;<br>__int64 unk;<br>&#125;<span class="hljs-type">CALLBACK_ENTRY_ITEM</span>, *<span class="hljs-type">PCALLBACK_ENTRY_ITEM</span>;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>从上面的结构体可以明显看到，<code>PreOperation</code> 和 <code>PostOperation</code> 分别指向操作前回调函数地址与操作后回调函数地址</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730111835855.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li><p>上图可以看到<code>CallbackList</code> 的偏移是0xc8，Flink 指向的0xffffd28b57928bc0 地址就是<code>CALLBACK_ENTRY_ITEM</code>结构的地址。其中PreOperation 的偏移为0x28 ，PostOperation 的偏移为0x30 。后面只需要将<code>PreOperation</code>和<code>PostOperation</code> 指向的地址设置为0即可。</p>
+</li>
+<li><p>现在知道了回调函数的位置在哪儿，新的问题是如何通过代码定位<code>PsProcessType</code>和<code>PsThreadType</code> 这两个全局内核变量。</p>
+</li>
+<li><p>通过IDA 的交叉引用可以找到调用了<code>PsProcessType</code> 和<code>PsThreadType</code> 的函数，并且还这个函数还需要是ntoskrnl.exe 的导出函数。</p>
+</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730114806713.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730114959056.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li><p>通过分析发现NtDuplicateObject()函数中引用了<code>PsProcessType</code> 全局内核变量，而在NtOpenThreadTokenEx() 函数中引用了<code>PsThreadType</code> 全局内核变量。并且这两个函数在win7上也引用了相应的变量，同时也是ntoskrnl.exe 的导出函数。</p>
+</li>
+<li><p>首先定位<code>PsProcessType</code> 和<code>PsThreadType</code>全局内核变量地址，根据偏移获得<code>CALLBACK_ENTRY_ITEM</code>的双向链表结构，遍历此结构将<code>PreOperation</code> 和<code>PostOperation</code> 指向的地址置0。</p>
+</li>
+<li><p>部分代码截图</p>
+</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730114156574.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>效果如下</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730111127159.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>清除回调后，我们现在能以普通管理员用户权限去Kill 杀软进程了。当然，我们的目的是为了致盲EDR 而不是干掉EDR，这只是删除回调后的的附带效果。我们随时能够Kill EDR。之后，杀软无法阻止我们获取任何进程的高权限句柄，也无法监控到我们获取句柄的这个行为。</li>
+</ul>
+<h3 id="3-3-清除注册表回调（CmRegisterCallback）"><a href="#3-3-清除注册表回调（CmRegisterCallback）" class="headerlink" title="3.3.清除注册表回调（CmRegisterCallback）"></a>3.3.清除注册表回调（CmRegisterCallback）</h3><ul>
+<li>清除注册表通知回调，如果安全软件中通过注册回调，进行监控注册表的功能就会失效，对注册表的任何操作，都无法被监控，同时也能够清除EDR（注册回调监控注册表）对其服务注册表的保护，从而永久禁用EDR。</li>
+<li><code>CallbackListHead</code> 是一个双向链表，它是一个<code>CMREG_CALLBACK</code> 结构（未记录），里面包含了注册表通知回调函数的地址,其结构如下：</li>
+</ul>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs elm">typedef struct _CMREG_CALLBACK &#123;<br>    <span class="hljs-type">LIST_ENTRY</span> <span class="hljs-type">List</span>;<br>    <span class="hljs-type">ULONG</span> <span class="hljs-type">Unknown1</span>;<br>    <span class="hljs-type">ULONG</span> <span class="hljs-type">Unknown2</span>;<br>    <span class="hljs-type">LARGE_INTEGER</span> <span class="hljs-type">Cookie</span>;<br>    <span class="hljs-type">PVOID</span> <span class="hljs-type">Unknown3</span>;<br>    <span class="hljs-type">PEX_CALLBACK_FUNCTION</span> <span class="hljs-type">Function</span>;<br>&#125; <span class="hljs-type">CMREG_CALLBACK</span>, *<span class="hljs-type">PCMREG_CALLBACK</span>;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>可以看到Function指向回调函数的地址，其偏移为0x28 。我们可以在CmUnRegisterCallback()这个ntoskrnl.exe导出函数函数中找到<code>CallbackListHead</code> 地址。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730141223239.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>找到回调函数的地址了，由于这个位置受PatchGard保护，那我们就无法像之前的方法一样去清除回调了,后面尝试修改LIST_ENTRY 这个链表地址的值为0，但是依旧蓝屏，这里需要想想怎么Bypass PG。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730142305470.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>如果将双向链表的Flink 指向的地址修改为双向链表上已经存在的地址值，那就不会蓝屏，这就有了个思路，直接将第一个<code>CallbackListHead</code> 结构地址（也就是链表头） 指向为最后一个<code>CallbackListHead</code> ，这样就能够清除掉中间的EDR注册的链表。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730151106264.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730144714408.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>Github上面的代码是修改了链表头<code>CallbackListHead</code>的Flink(前向链接) 指针，让它指向了链表头自己，通过 Flink 指针遍历链表的代码（这是绝大多数的遍历方式），都会在第一步就发现 Entry-&gt;Flink &#x3D;&#x3D; listHead，从而认为链表是空的，立即停止遍历</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730151353515.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>建议仅永久禁用杀毒软件，但EDR 等安全解决方案不建议永久关闭，掉线可能会被管理员发现。清除注册表回调后，这样就能禁用EDR 对其注册表项的保护。后续可以修改AV&#x2F;EDR 的服务配置，以及注册表中的启动项。</li>
+</ul>
+<h3 id="3-4-清除进程、线程、Image-加载通知回调"><a href="#3-4-清除进程、线程、Image-加载通知回调" class="headerlink" title="3.4.清除进程、线程、Image 加载通知回调"></a>3.4.清除进程、线程、Image 加载通知回调</h3><h4 id="3-4-1-清除进程通知回调-PsSetCreateProcessNotifyRoutine"><a href="#3-4-1-清除进程通知回调-PsSetCreateProcessNotifyRoutine" class="headerlink" title="3.4.1.清除进程通知回调(PsSetCreateProcessNotifyRoutine)"></a>3.4.1.清除进程通知回调(PsSetCreateProcessNotifyRoutine)</h4><ul>
+<li>驱动程序可以通过<code>PsSetCreateProcessNotifyRoutine()</code> 注册进程通知的回调函数，这样能在进程创建销毁时得到通知。</li>
+<li><code>PspCreateProcessNotifyRoutine</code> 是一个最大为64的结构体指针数组。创建&#x2F;终止进程时，<code>PspCallProcessNotifyRoutines</code>会遍历此数组并调用系统上驱动程序注册的所有回调。所以如果能够清除此数组上的杀软回调那么就能使其监控进程的功能失效。</li>
+<li>首先需要计算<code>PspCreateProcessNotifyRoutine</code>数组在内存中的位置才能进行修改，能想到的是<code>PsSetCreateProcessNotifyRoutine()</code> 这个注册进程回调的函数肯定会用到此数组。先反汇编一下<code>PsSetCreateProcessNotifyRoutine()</code> 函数，发现比较简单，里面调用了<code>PspSetCreateProcessNotifyRoutine()</code> 函数。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730153718904.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>继续反汇编<code>PspSetCreateProcessNotifyRoutine()</code>函数发现在此函数中汇编指令lea将<code>PspCreateProcessNotifyRoutine</code>数组的地址保存到了R13寄存器中。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730153917247.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>然后继续跟进<code>PspCreateProcessNotifyRoutine</code>数组地址。此数组内容中的结构体指针地址最后4位没有意义，所以通过移位操作去掉，最后获得的就是结构体的内容。</li>
+<li>下图为<code>PspCreateProcessNotifyRoutine</code>数组</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730154307682.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>查看结构体内容与驱动注册回调函数地址</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730154636521.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>此结构体为<code>EX_CALLBACK_ROUTINE_BLOCK</code> ，它是未公开的，但是<code>ReactOS</code>给了它定义：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">EX_CALLBACK_ROUTINE_BLOCK</span> &#123;</span><br>    EX_RUNDOWN_REF RundownProtect;<br>    PEX_CALLBACK_FUNCTION Function;<br>    PVOID Context;<br>&#125; EX_CALLBACK_ROUTINE_BLOCK, *PEX_CALLBACK_ROUTINE_BLOCK;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>该结构体前8位是<code>EX_RUNDOWN_REF</code> 结构，可以忽略，后面的<code>PEX_CALLBACK_FUNCTION</code> 就是回调函数的地址。</li>
+<li>拿到这个回调函数地址之后可以利用驱动的任意地址写向其写入0或ret指令</li>
+</ul>
+<h4 id="3-4-2-清除线程通知回调-PsSetCreateThreadNotifyRoutine"><a href="#3-4-2-清除线程通知回调-PsSetCreateThreadNotifyRoutine" class="headerlink" title="3.4.2.清除线程通知回调(PsSetCreateThreadNotifyRoutine)"></a>3.4.2.清除线程通知回调(PsSetCreateThreadNotifyRoutine)</h4><ul>
+<li>线程通知回调函数的地址是通过回调注册函数PsSetCreateThreadNotifyRoutine() 中定位<code>PspCreateThreadNotifyRoutine</code> 数组来获取的。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730160148499.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h4 id="3-4-3-清除加载通知回调-PsSetLoadImageNotifyRoutine"><a href="#3-4-3-清除加载通知回调-PsSetLoadImageNotifyRoutine" class="headerlink" title="3.4.3.清除加载通知回调(PsSetLoadImageNotifyRoutine)"></a>3.4.3.清除加载通知回调(PsSetLoadImageNotifyRoutine)</h4><ul>
+<li>Image 通知回调函数地址是通过回调注册函数PsSetLoadImageNotifyRoutine() 中定位<code>PspLoadImageNotifyRoutine</code> 数组来获取的。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730160245769.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>所以代码逻辑基本完全一样，只是寻找的函数不同而已，上文中已讲诉如何寻找地址这里不多做阐述。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730160848998.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730161630277.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h3 id="3-5-清除MiniFilter框架注册的回调"><a href="#3-5-清除MiniFilter框架注册的回调" class="headerlink" title="3.5.清除MiniFilter框架注册的回调"></a>3.5.清除MiniFilter框架注册的回调</h3><ul>
+<li>EDR 依赖文件系统微过滤器（Minifilter）框架，通过在文件I&#x2F;O路径上注册回调，来实现对所有文件操作（如创建、写入、删除）的实时监控。更关键的是，它也利用此机制防止自身组件或关键文件被篡改。因此，一旦我们能成功地<strong>将EDR的微过滤器从系统中摘除</strong>，就等于直接瘫痪了EDR的文件监控与防护。</li>
+</ul>
+<h4 id="3-5-1-注册MiniFilter的驱动代码"><a href="#3-5-1-注册MiniFilter的驱动代码" class="headerlink" title="3.5.1.注册MiniFilter的驱动代码"></a>3.5.1.注册MiniFilter的驱动代码</h4><ul>
+<li><p>注册 MiniFilter 过滤器和注册进程回调 (PsSetCreateProcessNotifyRoutine) 有着很大的不同，PsSetCreateProcessNotifyRoutine是一种轻量级的、点对点的通知机制。只需要调用API，注册一个简单的回调函数，来监控一个非常特定的事件（进程的创建和退出）。MiniFilter 是一个结构化的过滤框架，需要将你的整个驱动程序注册到”筛选管理器 (Filter Manager)”这个框架中，通过一套复杂的结构和规则，来全面地拦截和处理文件系统的I&#x2F;O请求。</p>
+</li>
+<li><p>这里简单的实现了一个简单的MiniFilter过滤驱动，先从代码理解怎么注册文件过滤驱动</p>
+</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730163506488.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730163714837.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730164013951.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730164337509.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<p><strong>这段代码正在将当前的驱动程序注册到 Windows 的筛选管理器 (Filter Manager) 中，使其成为一个活动的文件系统筛选驱动 (Minifilter)</strong></p>
+<ul>
+<li><p><strong>第一个参数 DriverObject</strong>: 这是 DriverEntry 函数接收到的标准驱动对象指针。它代表了你的驱动程序本身。</p>
+</li>
+<li><p><strong>第二个参数 &amp;FilterRegistration</strong>: FilterRegistration 是一个 FLT_REGISTRATION 类型的结构体</p>
+<ul>
+<li><p>当驱动要卸载时，它知道该调用 FsFilterhidefileUnload。</p>
+</li>
+<li><p>当有新的磁盘卷出现时，它知道该调用 FsFilterhidefileInstanceSetup。</p>
+</li>
+<li><p>当有文件读写操作发生时，它会查阅 Callbacks 数组，找到对应的处理函数并进行调用</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><strong>第三个参数 &amp;gFilterHandle</strong>: 这是一个输出参数。如果注册成功，筛选管理器会返回一个唯一的句柄，并将其存储在全局变量 gFilterHandle 中。这个句柄代表了你注册成功的筛选器。将来，当你的驱动程序需要卸载时，就必须调用 FltUnregisterFilter 并传入这个句柄，来告诉筛选管理器”我要注销服务了”。</li>
+</ul>
+<h4 id="3-5-2-查看回调"><a href="#3-5-2-查看回调" class="headerlink" title="3.5.2.查看回调"></a>3.5.2.查看回调</h4><ul>
+<li>下面来看EDR 注册的微过滤器驱动程序的回调函数位置,使用如下命令查看<strong>当前系统中所有已经注册并且处于活动状态的文件系统微过滤器（Minifilter）驱动程序列表</strong></li>
+</ul>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-addition">!fltkd.filters</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730165536144.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>如上图所示获取到FLT_INSTANCE结构体地址，使用如下命令进行查看</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-tag">dt</span> ffffd70f6fd0f010 _FLT_INSTANCE<br></code></pre></td></tr></table></figure>
+
+
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730165710269.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>进入<code>CallBackNodes</code>数组，可以看到回调函数地址：</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730170400998.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li><p>这里的回调函数地址，某些可以直接置0，但是有些位置的地址置0之后会触发PatchGuard 保护，所以这里不能直接修改回调函数地址。</p>
+</li>
+<li><p>经分析发现，不去修改他的回调函数地址，而是清空<code>CallbackNodes</code> 数组的话则不会触发蓝屏，成功Bypass PathGuard。</p>
+</li>
+</ul>
+<h4 id="3-5-3-跟踪内核调用遍历callbacks"><a href="#3-5-3-跟踪内核调用遍历callbacks" class="headerlink" title="3.5.3.跟踪内核调用遍历callbacks"></a>3.5.3.跟踪内核调用遍历callbacks</h4><ul>
+<li>参考文章 Part 1: Fs Minifilter Hooking，他通过断点调试发现内核是通过fltmgr:FltpPerformPreCallbacks 函数来调用微过滤器驱动的回调函数的</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730191309451.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>在FltpPerformPreCallbacks 中又调用了FltpPerformPreCallbacksWorker 进行回调的调用。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730191320624.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li><p>上面的反编译代码直观的体现了，内核调用的是volume 中的callbacks列表中的回调函数。</p>
+</li>
+<li><p>分析发现在FLTP_FRAME 结构的字段中保存FLT_VOLUMES 结构的地址链表，通过遍历此链表可以获得所有的FLT_VOLUMES</p>
+</li>
+<li><p>如下图所示获取FLTP_FRAME的地址</p>
+</li>
+</ul>
+<figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs diff"><span class="hljs-addition">!fltkd.frames</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730182737898.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>使用此地址查看FLTP_FRAME结构，查看<code>AttachedVolumes  : _FLT_RESOURCE_LIST_HEAD</code></li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730180025828.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>接着来看看FLT_VOLUMES 结构。</li>
+</ul>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs x86asm"><span class="hljs-built_in">dt</span> <span class="hljs-number">0xffffd70f6fc86010</span>  _FLT_VOLUME<br></code></pre></td></tr></table></figure>
+
+
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730180958307.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>通过名称我们可以轻松的找到存储回调函数结构（<code>_CALLBACK_NODE</code>）的数组。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730181040635.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>每个数组保存了一个<code>_CALLBACK_NODE</code> 结构的双向链表（这个结构中的地址和FLT_INTANCE 的callbacknodes 数组中保存的地址相同），我们需要遍历并清除这个链表中的包含EDR 回调的<code>_CALLBACK_NODE</code> 结构。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730182109686.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>修改Volumes 的callback 数组也会触发PG保护导致蓝屏,找到了一个办法可以Bypass PG，比如数组中的其中一个<code>_LIST_ENTRY</code> 双向链表中，Flink 保存了EDR 注册的<code>_CALLBACK_NODE</code>结构，下一个Flink 也保存了系统自带的例如FileInfo驱动的<code>_CALLBACK_NODE</code>结构。我们可以将首地址直接修改为FileInfo驱动的<code>_CALLBACK_NODE</code> 结构地址。这样将EDR 的<code>_CALLBACK_NODE</code> 结构从整个双向链表中摘了出来，且这样不会触发蓝屏。</li>
+<li>注意：只清除EDR 的地址，不要清除系统本身驱动注册的地址，否则会导致系统崩溃。</li>
+</ul>
+<h4 id="3-5-4-代码获取FLTP-FRAME地址"><a href="#3-5-4-代码获取FLTP-FRAME地址" class="headerlink" title="3.5.4.代码获取FLTP_FRAME地址"></a>3.5.4.代码获取FLTP_FRAME地址</h4><ul>
+<li>上面是通过windbg命令直接获取的FLTP_FRAME的值，现在要通过代码获取,还是按照之前的思路，我们先去找一下FLTMGR 中的全局变量。</li>
+</ul>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-tag">dt</span> FLTMGR!Globals<br></code></pre></td></tr></table></figure>
+
+
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730171425699.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>发现有一个名为FrameList 的_FLT_RESOURCE_LIST_HEAD 结构，使用如下命令查看此结构。</li>
+</ul>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs llvm">? FLTMGR<span class="hljs-title">!FltGlobals</span><br>dt fffff<span class="hljs-number">8014034</span><span class="hljs-keyword">c</span><span class="hljs-number">700</span> _FLT_RESOURCE_LIST_HEAD<br></code></pre></td></tr></table></figure>
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730172330037.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>结构中有双向链表点击查看</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730172434365.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>如上图所示，发现里面又包含LIST_ENTRY双向链表结构继续查看</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730172532615.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>如上图所示发现LIST_ENTRY双向链表结构里面的值就是Frame 的地址,继续查看此地址中的值：</li>
+</ul>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs x86asm"><span class="hljs-built_in">dd</span> <span class="hljs-number">0xfffff8014034c7c0</span><br>!fltkd<span class="hljs-number">.</span>frames<br></code></pre></td></tr></table></figure>
+
+
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730173744398.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li><p>发现此地址中的值0xffffd70f6f55a4a8  - 0x8 就是FLTP_FRAME 的值。</p>
+</li>
+<li><p>现在可以通过FLT_RESOURCE_LIST_HEAD结构获取FLTP_FRAME 的值了，FLT_RESOURCE_LIST_HEAD 是在FltGlobals 结构中获取的，现在寻找怎么获取FltGlobals的值。</p>
+</li>
+<li><p>上面说过怎么找了，这里是通过fltMgr!FltEnumerateFilters中找到的如下图所示。</p>
+</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250731091630219.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>下图为使用与代码片段</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730191944090.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250730194324974.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>经过上面的分析调试可以知道，原文作者经过了大量时间精力的付出，且过程很痛苦，感谢。</li>
+</ul>
+<h2 id="四-还原系统回调链"><a href="#四-还原系统回调链" class="headerlink" title="四.还原系统回调链"></a>四.还原系统回调链</h2><ul>
+<li>上面介绍了如何摘掉驱动链条，按照上面ByPass EDR的时候都是在写内核的地址，所以每次写入的地址、长度、数据保存起来，写入文件，工作完毕后重新恢复环境。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250731101730018.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250731101807596.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<h2 id="五-驱动加载"><a href="#五-驱动加载" class="headerlink" title="五.驱动加载"></a>五.驱动加载</h2><ul>
+<li>按照上面的利用驱动摘链的方式，是需要有内核的读写权限的，可以通过一些Windows nDay漏洞中具有读写内核的，一般能提权的都可以。</li>
+<li>自己挖掘一些具有白签名的驱动去读写内核</li>
+<li>自己编码驱动并加载</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250731103513163.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h2 id="六-利用WFP网络过滤框架阻止EDR上传信息"><a href="#六-利用WFP网络过滤框架阻止EDR上传信息" class="headerlink" title="六.利用WFP网络过滤框架阻止EDR上传信息"></a>六.利用WFP网络过滤框架阻止EDR上传信息</h2><ul>
+<li>wfp框架过于复杂，这里只是简单描述一下。</li>
+</ul>
+<h3 id="6-1-WFP是什么"><a href="#6-1-WFP是什么" class="headerlink" title="6.1.WFP是什么"></a>6.1.WFP是什么</h3><ul>
+<li><p><a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/win32/fwp/windows-filtering-platform-start-page">https://learn.microsoft.com/zh-cn/windows/win32/fwp/windows-filtering-platform-start-page</a></p>
+</li>
+<li><p>Windows 筛选平台（Windows Filtering Platform)，WFP是一组API和系统服务，为Windows操作系统提供了一个网络数据包过滤和应用程序层筛选的框架。它可以被用来实现防火墙、入侵检测系统、网络流量监控等功能。WFP 允许开发人员编写代码，与操作系统网络堆栈中不同层的数据包处理进行交互，从而实现对网络数据包的过滤和修改。</p>
+</li>
+<li><p>简单来说，WFP 是Windows 用于管理和控制网络流量的一个强大工具，它提供了一种灵活且可定制的方式来过滤和处理网络数据包。﻿</p>
+</li>
+<li><p>WFP是需要在Windows 7以上系统支持的，要想在xp、03等比较老旧的系统上实现网络过滤可以采用NDIS、TDI等框架实现，当然选择一些第三方的框架也很不错。</p>
+</li>
+</ul>
+<h3 id="6-2-WFP的内核层与用户层"><a href="#6-2-WFP的内核层与用户层" class="headerlink" title="6.2.WFP的内核层与用户层"></a>6.2.WFP的内核层与用户层</h3><img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801161320700.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>Windows Filtering Platform (WFP) 分为用户层和内核层，它们共同工作来过滤和修改网络流量。</li>
+</ul>
+<h4 id="6-2-1-用户层"><a href="#6-2-1-用户层" class="headerlink" title="6.2.1.用户层"></a>6.2.1.用户层</h4><ul>
+<li>用户层的主要任务是配置WFP，包括创建和管理过滤引擎、过滤器等，并提供API供应用程序使用，允许用户动态地管理和配置内核层的过滤规则</li>
+<li>WFP的用户层通常与应用程序交互，提供用户界面来配置网络过滤策略，我们此文中就是简单调用WFP的用户层api进行阻止网络连接</li>
+</ul>
+<h4 id="6-2-2-内核层"><a href="#6-2-2-内核层" class="headerlink" title="6.2.2.内核层"></a>6.2.2.内核层</h4><ul>
+<li><p>内核层负责执行WFP定义的过滤规则，对网络流量进行实际的过滤和处理，还具有一套强大的内核模式API，允许开发者编写驱动对网络流量实现诸如深度包检测、动态内容修改和无缝重定向等高级操作。</p>
+</li>
+<li><p>由于内核层直接与网络驱动程序交互，它能够提供高性能的过滤能力，</p>
+</li>
+</ul>
+<h3 id="6-3-WFP编码"><a href="#6-3-WFP编码" class="headerlink" title="6.3.WFP编码"></a>6.3.WFP编码</h3><h4 id="6-3-1-wfp-用户层代码示例"><a href="#6-3-1-wfp-用户层代码示例" class="headerlink" title="6.3.1.wfp 用户层代码示例"></a>6.3.1.wfp 用户层代码示例</h4><h5 id="6-3-1-1-wfp-调用api"><a href="#6-3-1-1-wfp-调用api" class="headerlink" title="6.3.1.1.wfp 调用api"></a>6.3.1.1.wfp 调用api</h5><img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801164355271.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801164417820.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h5 id="6-3-1-2-WinDivert-端口复用"><a href="#6-3-1-2-WinDivert-端口复用" class="headerlink" title="6.3.1.2.WinDivert 端口复用"></a>6.3.1.2.WinDivert 端口复用</h5><ul>
+<li>WinDivert是一种用户模式的数据包捕获和转移包，可用于windows vista、windows 2008、windows 7、windows 8 和 windows 10。WinDivert允许用户模式应用程序捕获、修改、丢弃从windows网络堆栈发送的网络数据包，而无需编写内核模式代码，但是需要加载此框架的驱动。wfp只调用用户层API的话是不需要加载驱动的，但是WinDivert提供了更复杂的更好用的过滤规则，如果对性能有要求的话还是建议编写内核驱动进行过滤。</li>
+<li>以下代码是使用WinDivert 框架，此框架是对WFP的高级封装，也可以很方便的实现防火墙的功能，当然还有很多其他好用的网络过滤框架，这里不多提及了。</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801162253175.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801162303495.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h4 id="6-3-2-wfp-内核层代码示例"><a href="#6-3-2-wfp-内核层代码示例" class="headerlink" title="6.3.2.wfp 内核层代码示例"></a>6.3.2.wfp 内核层代码示例</h4><ul>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/microsoft/Windows-driver-samples/tree/main/network/trans">https://github.com/microsoft/Windows-driver-samples/tree/main/network/trans</a></p>
+</li>
+<li><p>只是简单的阻止网络连接，不涉及更多的过滤操作没有放内核代码，想要实现更细粒度的过滤网络行为，比如我只放行EDR的心跳包之类的操作，需要逆向加内核编程了。可以在上面连接中查看Microsoft给出的使用示例。</p>
+</li>
+</ul>
+<h3 id="6-4-调用WFP-API-阻止网络连接"><a href="#6-4-调用WFP-API-阻止网络连接" class="headerlink" title="6.4.调用WFP API 阻止网络连接"></a>6.4.调用WFP API 阻止网络连接</h3><ul>
+<li>安装</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801165954369.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801170012283.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801170033069.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801170122278.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801170202632.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801170218050.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>卸载</li>
+</ul>
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801170413877.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/01/16/ByPass%20EDR(BYOVD)/20250801170433615.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+
+
+<h2 id="七-总结"><a href="#七-总结" class="headerlink" title="七.总结"></a>七.总结</h2><ul>
+<li>本文采用驱动摘链的方式进行ByPass EDR,只是ByPass EDR的一种方式，是针对的Windows 操作系统提供的回调函数，有不少EDR对自己的回调具有保护，需要逆向分析解决。有些EDR是不使用系统回调进行监控的，这种摘链方式就对其不起作用了，并介绍了使用WFP api用于阻止网络连接的技术，Bypass EDR的方式还有很多希望以后能分享更多的安全知识。</li>
+</ul>
+<h2 id="八-参考"><a href="#八-参考" class="headerlink" title="八.参考"></a>八.参考</h2><ul>
+<li><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/ZMTjDMMdQoOczxzZ7OAGtA">https://mp.weixin.qq.com/s/ZMTjDMMdQoOczxzZ7OAGtA</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://br-sn.github.io/Removing-Kernel-Callbacks-Using-Signed-Drivers/">https://br-sn.github.io/Removing-Kernel-Callbacks-Using-Signed-Drivers/</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://aviadshamriz.medium.com/part-1-fs-minifilter-hooking-7e743b042a9d">https://aviadshamriz.medium.com/part-1-fs-minifilter-hooking-7e743b042a9d</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/lawiet47/STFUEDR">https://github.com/lawiet47/STFUEDR</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/NanoWraith/BlindEdr">https://github.com/NanoWraith/BlindEdr</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/myzxcg/RealBlindingEDR">https://github.com/myzxcg/RealBlindingEDR</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/NanoWraith/rwdriver">https://github.com/NanoWraith/rwdriver</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.loldrivers.io/drivers/afb8bb46-1d13-407d-9866-1daa7c82ca63/">https://www.loldrivers.io/drivers/afb8bb46-1d13-407d-9866-1daa7c82ca63/</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.aon.com/en/insights/cyber-labs/bypassing-edr-through-retrosigned-drivers-and-system-time-manipulation?collection=5b76135e-4196-415b-ab1d-f42b6f0abb10">https://www.aon.com/en/insights/cyber-labs/bypassing-edr-through-retrosigned-drivers-and-system-time-manipulation?collection=5b76135e-4196-415b-ab1d-f42b6f0abb10</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/netero1010/EDRSilencer/tree/main">https://github.com/netero1010/EDRSilencer/tree/main</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/basil00/WinDivert">https://github.com/basil00/WinDivert</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37353105/article/details/127118107">https://blog.csdn.net/qq_37353105/article/details/127118107</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/microsoft/Windows-driver-samples/tree/main/network/trans">https://github.com/microsoft/Windows-driver-samples/tree/main/network/trans</a></p>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/window-security/" class="category-chain-item">window_security</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/bypassedr/" class="print-no-link">#bypassedr</a>
+      
+        <a href="/tags/Windows/" class="print-no-link">#Windows</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>ByPassEdr(BYOVD)</div>
+      <div>http://example.com/2026/01/16/ByPass EDR(BYOVD)/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>koffer</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年1月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/16/2026-01-16/" title="Fri Jan 16 2026 00:00:00 GMT+0800 (中国标准时间)">
+                        <span class="hidden-mobile">Fri Jan 16 2026 00:00:00 GMT+0800 (中国标准时间)</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"KcBDxBVjuAIRBOMxATX1NGgM-gzGzoHsz","appKey":"wPPBYEGRlaJCidLjpd0ax34K","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"https://kcbdxbvj.lc-cn-n1-shared.com","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
