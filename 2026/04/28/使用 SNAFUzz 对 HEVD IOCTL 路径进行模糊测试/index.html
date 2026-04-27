@@ -1,0 +1,926 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="koffer">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试一.简介 我一直对 Windows 内核进行 fuzz 感兴趣，阅读了许多大佬的文章并了解了不少开源项目，如 kafl、syzkaller、msfuzz 等。大家对 fuzz 测试的魔改或适配工作量非常大，而我自己曾尝试过使用 Intel PT 在虚拟机中做一些覆盖率相关的工作，发现这个过程超出了我的能力范围。下班后的时间有限，难以完">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试">
+<meta property="og:url" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/index.html">
+<meta property="og:site_name" content="koffer&#39;s blog">
+<meta property="og:description" content="使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试一.简介 我一直对 Windows 内核进行 fuzz 感兴趣，阅读了许多大佬的文章并了解了不少开源项目，如 kafl、syzkaller、msfuzz 等。大家对 fuzz 测试的魔改或适配工作量非常大，而我自己曾尝试过使用 Intel PT 在虚拟机中做一些覆盖率相关的工作，发现这个过程超出了我的能力范围。下班后的时间有限，难以完">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411184904806.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411185310923.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411185424941.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411185552125.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411190856046.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411191656240.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192309620.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192419680.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192608992.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192804047.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192644050.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192932966.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192941745.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192948795.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411193222663.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411193759647.png">
+<meta property="og:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411193521287.png">
+<meta property="article:published_time" content="2026-04-27T16:07:08.000Z">
+<meta property="article:modified_time" content="2026-04-27T17:14:52.737Z">
+<meta property="article:author" content="koffer">
+<meta property="article:tag" content="vulnerability_analysis">
+<meta property="article:tag" content="fuzz">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411184904806.png">
+  
+  
+  
+  <title>使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试 - koffer&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"KcBDxBVjuAIRBOMxATX1NGgM-gzGzoHsz","app_key":"wPPBYEGRlaJCidLjpd0ax34K","server_url":"https://kcbdxbvj.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>koffer</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-04-28 00:07" pubdate>
+          2026年4月28日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="使用-SNAFUzz-对-HEVD-IOCTL-路径进行模糊测试"><a href="#使用-SNAFUzz-对-HEVD-IOCTL-路径进行模糊测试" class="headerlink" title="使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试"></a>使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试</h1><h2 id="一-简介"><a href="#一-简介" class="headerlink" title="一.简介"></a>一.简介</h2><ul>
+<li>我一直对 Windows 内核进行 fuzz 感兴趣，阅读了许多大佬的文章并了解了不少开源项目，如 <code>kafl、syzkaller、msfuzz</code> 等。大家对 fuzz 测试的魔改或适配工作量非常大，而我自己曾尝试过使用 <code>Intel PT</code> 在虚拟机中做一些覆盖率相关的工作，发现这个过程超出了我的能力范围。下班后的时间有限，难以完成这些任务。不过，最近我发现了 <code>SNAFUzz</code>，感觉它满足了我的需求。我下载并成功使用复现了其中<code>HEVD</code>的示例，现在将自己的使用过程记录下来，但不会涉及太多原理性的内容。随着 AI 技术的快速发展，未来很多传统的工作会被 AI 所取代，像 <code>fuzz</code> 这样的任务，未来只需向 <code>AI</code> 简单指令一下，便能自动化完成，很有压力！</li>
+</ul>
+<h2 id="二-环境"><a href="#二-环境" class="headerlink" title="二.环境"></a>二.环境</h2><table>
+<thead>
+<tr>
+<th align="center">名称</th>
+<th align="center">版本</th>
+<th align="center">备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">AI 工具</td>
+<td align="center">GPT 5.3 + Codex</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">FUZZ</td>
+<td align="center">SNAFUzz</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://github.com/fkie-cad/SNAFUzz">https://github.com/fkie-cad/SNAFUzz</a></td>
+</tr>
+<tr>
+<td align="center">VMware</td>
+<td align="center">VMware Workstation 17 Pro</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">Windows 虚拟机</td>
+<td align="center">Windows 10  21H2</td>
+<td align="center">Vmware 中运行</td>
+</tr>
+<tr>
+<td align="center">Windows 虚拟机</td>
+<td align="center">Windows 11 23H2</td>
+<td align="center">在 Windows 10  21H2 中 Hyper-V中运行</td>
+</tr>
+<tr>
+<td align="center">HEVD</td>
+<td align="center">HEVD 3.0</td>
+<td align="center"><a target="_blank" rel="noopener" href="https://github.com/hacksysteam/HackSysExtremeVulnerableDriver">https://github.com/hacksysteam/HackSysExtremeVulnerableDriver</a></td>
+</tr>
+</tbody></table>
+<ul>
+<li>vmware 虚拟机中运行 Windows 10 21H2，主要操作是在Windows 10 21H2上执行的</li>
+</ul>
+<h2 id="三-编译-SNAFUzz"><a href="#三-编译-SNAFUzz" class="headerlink" title="三.编译 SNAFUzz"></a>三.编译 SNAFUzz</h2><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">git <span class="hljs-keyword">clone</span> <span class="hljs-title">https</span>://github.com/fkie-cad/SNAFUzz.git<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>项目依赖 VS编译环境，下载个编译工具包就行，我这里直接安装了 <code>VS 2022</code></li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs stylus">cl kernel_snapshot<span class="hljs-selector-class">.c</span><br>build<span class="hljs-selector-class">.bat</span> hevd<span class="hljs-selector-class">.c</span> <br><span class="hljs-comment">//过 build.bat hevd.c 将 hevd.c 编译为目标特化模块:</span><br>	<span class="hljs-comment">//该文件实现了 target_initialize、target_get_input、target_execute_input 等接口，可按需修改为自己的目标逻辑。</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411184904806.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h2 id="四-虚拟机中启用HYPER-V"><a href="#四-虚拟机中启用HYPER-V" class="headerlink" title="四.虚拟机中启用HYPER-V"></a>四.虚拟机中启用HYPER-V</h2><ul>
+<li>使用<code>VMware</code>创建<code>Windows 10  21H2</code>虚拟机，在<code>Windows 10  21H2</code>中开启 <code>Hyper-V</code></li>
+<li>先开启<code>VT-X</code></li>
+</ul>
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411185310923.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<ul>
+<li>使用<code>powershell</code>启用Hyper-V功能</li>
+</ul>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-comment">#开启hyper-v-powershell</span><br><span class="hljs-attribute">Enable</span>-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -<span class="hljs-literal">All</span><br><br><span class="hljs-comment">#查看启用状态</span><br><span class="hljs-attribute">Get</span>-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-<span class="hljs-literal">All</span><br><br></code></pre></td></tr></table></figure>
+
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411185424941.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>然后可以使用<code>Hyper-V 管理器</code>,安装一个<code>Windows 11 23H2</code>的虚拟机</li>
+</ul>
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411185552125.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h2 id="五-开始-fuzz"><a href="#五-开始-fuzz" class="headerlink" title="五.开始 fuzz"></a>五.开始 fuzz</h2><h3 id="5-1-文件拷贝"><a href="#5-1-文件拷贝" class="headerlink" title="5.1.文件拷贝"></a>5.1.文件拷贝</h3><ul>
+<li>这里使用如下命令，会发现虚拟机卡死无法启动，同时查看 <code>git</code>中也有提到这个，给出一个可以拷贝文件的，但是还是无法执行命令</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus">snafuzz<span class="hljs-selector-class">.exe</span> <span class="hljs-string">&quot;\win11\Virtual Hard Disks\win11.vhdx&quot;</span> <br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>所以直接使用<code>Hyper-v</code>启动<code>Win 11</code>虚拟机，将<code>hevd.sys</code>与<code>kernel_snapshot.exe</code>拷贝进去。</li>
+</ul>
+<h3 id="5-2-自启动"><a href="#5-2-自启动" class="headerlink" title="5.2.自启动"></a>5.2.自启动</h3><ul>
+<li>设置驱动自启</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs powershell"><span class="hljs-built_in">sc</span> create hevd binPath= C:\Users\test\Desktop\<span class="hljs-number">1</span>\HEVD.sys <span class="hljs-built_in">type</span>= kernel <span class="hljs-built_in">start</span>= auto<br><span class="hljs-built_in">sc</span> config hevd <span class="hljs-built_in">start</span>= auto<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>在 <code>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup</code>下创建自启动脚本，用来拉起<code>kernel_snapshot.exe</code></li>
+<li>注意要登陆才会执行，可以设置系统自动登录或者计划任务等方式</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">@<span class="hljs-built_in">echo</span> off<br><span class="hljs-built_in">timeout</span> /t 45 /nobreak &gt;nul<br>C:\Users\<span class="hljs-built_in">test</span>\Desktop\qq\kernel_snapshot.exe<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-3-删除检查点"><a href="#5-3-删除检查点" class="headerlink" title="5.3.删除检查点"></a>5.3.删除检查点</h3><ul>
+<li>启动时指定<code>win11.vhdx</code>，<code>avhdx</code>后缀就是类似快照，在Hyper-v中叫检查点。</li>
+</ul>
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411190856046.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<h3 id="5-4-下载符号"><a href="#5-4-下载符号" class="headerlink" title="5.4.下载符号"></a>5.4.下载符号</h3><ul>
+<li>使用<code>WinDbg</code>中<code>symchk </code>工具下载<code>ntoskrnl</code>符号（Win11）</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">symchk /v /s srv*C:\symbols*https://msdl.microsoft.com/download/symbols C:\Users\<span class="hljs-built_in">test</span>\Desktop\git\ntoskrnl.exe<br><br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-5-创建hevd-snapshot快照"><a href="#5-5-创建hevd-snapshot快照" class="headerlink" title="5.5.创建hevd.snapshot快照"></a>5.5.创建<code>hevd.snapshot</code>快照</h3><ul>
+<li>执行如下命令，要先将上面的文件拷贝、自启动等，执行起来的时候按下<code>ctrl+c</code>进入调试模式</li>
+</ul>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs livescript">.<span class="hljs-string">\snafuzz.exe</span> <span class="hljs-string">&quot;C:\Users\test\Desktop\1\win11\Virtual Hard Disks\win11.vhdx&quot;</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411191656240.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>执行如下命令</li>
+</ul>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs armasm"><br><span class="hljs-keyword">bp</span> nt!NtSetInformationTransactionManager   <span class="hljs-comment">//这是上面执行kernel_snapshot.exe时会触发用来创建一个干净的快照</span><br>g<br><br><span class="hljs-symbol">kernel_modules</span>  <span class="hljs-comment">//查看加载模块</span><br><span class="hljs-symbol">load_pdb</span> C:\Users\test\Desktop\SNAFUzz\nt.pdb <span class="hljs-comment">//第一次没加载符号的时候</span><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>等待<code>NtSetInformationTransactionManager</code>断点,使用<code>snapshot hevd</code>创建快照,创建完就可以退出了。</li>
+</ul>
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192309620.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192419680.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h3 id="5-5-执行-fuzz"><a href="#5-5-执行-fuzz" class="headerlink" title="5.5.执行 fuzz"></a>5.5.执行 fuzz</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">snafuzz.exe hevd.<span class="hljs-keyword">snapshot</span> <span class="hljs-comment">--</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192608992.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>这里第一次执行的时候可能会报错，是因为符号找不到，创建对应的目录，拷贝符号就好了</li>
+</ul>
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192804047.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+
+
+<h2 id="六-触发崩溃"><a href="#六-触发崩溃" class="headerlink" title="六.触发崩溃"></a>六.触发崩溃</h2><ul>
+<li>崩溃在<code>crashes</code>目录下</li>
+</ul>
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192644050.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>使用如下命令复现</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stylus">snafuzz<span class="hljs-selector-class">.exe</span> hevd<span class="hljs-selector-class">.snapshot</span> -- -- -r crashes\xxx<span class="hljs-selector-class">.crash</span> -d<br>snafuzz<span class="hljs-selector-class">.exe</span> hevd<span class="hljs-selector-class">.snapshot</span> -r crashes\bugcheck_at_FFFFF80723961157_3B9B0EB5388BEF5D<span class="hljs-selector-class">.crash</span> -d --<br></code></pre></td></tr></table></figure>
+
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192932966.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192941745.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411192948795.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<ul>
+<li>这里能复现之后，就想到我要用<code>windbg</code>去调试然后我怎么去触发<code>crash</code>,问问AI吧</li>
+</ul>
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411193222663.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+<h2 id="七-查看覆盖"><a href="#七-查看覆盖" class="headerlink" title="七.查看覆盖"></a>七.查看覆盖</h2><ul>
+<li><code>SNAFUzz\scripts</code>目录下有个<code>ColorHitInstructions.java</code>脚本，运行脚本的时候会提示输入文件，文件在<code>coverage</code>目录下，结果如下图所示，覆盖到的变灰了，可以让<code>AI</code>直接改个能在<code>IDA</code>中运行的。</li>
+</ul>
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411193759647.png" srcset="/img/loading.gif" lazyload class="" title="png">
+
+
+
+
+<img src="/2026/04/28/%E4%BD%BF%E7%94%A8%20SNAFUzz%20%E5%AF%B9%20HEVD%20IOCTL%20%E8%B7%AF%E5%BE%84%E8%BF%9B%E8%A1%8C%E6%A8%A1%E7%B3%8A%E6%B5%8B%E8%AF%95/20260411193521287.png" srcset="/img/loading.gif" lazyload class="" title="png">
+<h2 id="八-总结"><a href="#八-总结" class="headerlink" title="八.总结"></a>八.总结</h2><ul>
+<li><code>SNAFUzz</code> 在 <code>IOCTL</code> 这类定向内核模糊测试场景下，整体比 <code>syzkaller、msfuzz</code>等 更轻量、流程更直观，部署和启动成本更低。虽然它不追求超大规模生态能力，但在“可复现执行 + 快照回滚 + 崩溃触发 + 覆盖反馈”这些核心环节上功能是完整的，足以支撑实战测试。</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/window-security/" class="category-chain-item">window_security</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/vulnerability-analysis/" class="print-no-link">#vulnerability_analysis</a>
+      
+        <a href="/tags/fuzz/" class="print-no-link">#fuzz</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试</div>
+      <div>http://example.com/2026/04/28/使用 SNAFUzz 对 HEVD IOCTL 路径进行模糊测试/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>koffer</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年4月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/04/28/CVE-2024-26229%20%E5%88%86%E6%9E%90%E4%B8%8E%20fuzz%20%E5%A4%8D%E7%8E%B0/" title="CVE-2024-26229 分析与 fuzz 复现">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CVE-2024-26229 分析与 fuzz 复现</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/19/%E5%9F%BA%E4%BA%8E%20IDA%20MCP%20%E7%9A%84%20BYOVD%20%E6%BC%8F%E6%B4%9E%E6%A8%A1%E5%BC%8F%E5%88%86%E6%9E%90%E4%B8%8E%E5%8D%8A%E8%87%AA%E5%8A%A8%E5%8C%96%E6%8E%A2%E7%B4%A2/" title="基于 IDA MCP 的 BYOVD 漏洞模式分析与半自动化探索">
+                        <span class="hidden-mobile">基于 IDA MCP 的 BYOVD 漏洞模式分析与半自动化探索</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"KcBDxBVjuAIRBOMxATX1NGgM-gzGzoHsz","appKey":"wPPBYEGRlaJCidLjpd0ax34K","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"https://kcbdxbvj.lc-cn-n1-shared.com","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
